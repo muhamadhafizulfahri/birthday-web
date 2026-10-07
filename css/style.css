@@ -1,0 +1,709 @@
+/* ========================================================
+   MODERN AESTHETIC BIRTHDAY THEME - STYLESHEET
+   Soft, Romantic, Interactive & Mobile-Optimized
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap');
+
+:root {
+  /* Default: Rose Gold Palette */
+  --bg-gradient: linear-gradient(135deg, #fff1f2 0%, #fdf2f8 50%, #fce7f3 100%);
+  --primary-accent: #f43f5e;
+  --secondary-accent: #fb7185;
+  --soft-pink: #ffe4e6;
+  --gold-accent: #f59e0b;
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --card-border: rgba(255, 255, 255, 0.85);
+  --text-main: #374151;
+  --text-muted: #6b7280;
+  --text-heading: #1f2937;
+  --glow-color: rgba(244, 63, 94, 0.35);
+}
+
+/* Theme: Sweet Lavender */
+body.theme-lavender {
+  --bg-gradient: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #fae8ff 100%);
+  --primary-accent: #8b5cf6;
+  --secondary-accent: #a78bfa;
+  --soft-pink: #ede9fe;
+  --gold-accent: #f59e0b;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(255, 255, 255, 0.9);
+  --glow-color: rgba(139, 92, 246, 0.35);
+}
+
+/* Theme: Peach Sunset */
+body.theme-peach {
+  --bg-gradient: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #ffe4e6 100%);
+  --primary-accent: #f97316;
+  --secondary-accent: #fb923c;
+  --soft-pink: #ffedd5;
+  --gold-accent: #eab308;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(255, 255, 255, 0.9);
+  --glow-color: rgba(249, 115, 22, 0.35);
+}
+
+/* Theme: Midnight Starlight */
+body.theme-midnight {
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+  --primary-accent: #f43f5e;
+  --secondary-accent: #fb7185;
+  --soft-pink: rgba(255, 255, 255, 0.1);
+  --gold-accent: #fcd34d;
+  --card-bg: rgba(30, 41, 59, 0.7);
+  --card-border: rgba(255, 255, 255, 0.15);
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-heading: #f8fafc;
+  --glow-color: rgba(244, 63, 94, 0.5);
+}
+
+body.theme-midnight .polaroid-card {
+  background: #ffffff;
+}
+body.theme-midnight .polaroid-caption p {
+  color: #1f2937;
+}
+
+/* ========================================================
+   BASE RESETS & TYPOGRAPHY
+   ======================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  transition: background 0.8s ease;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-handwritten {
+  font-family: 'Caveat', cursive;
+}
+
+.font-cursive {
+  font-family: 'Sacramento', cursive;
+}
+
+/* ========================================================
+   BACKGROUND FLOATING BOKEH / AMBIENCE
+   ======================================================== */
+.ambient-circle {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  animation: floatAmbient 12s infinite alternate ease-in-out;
+}
+
+.ambient-1 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #fbcfe8 0%, rgba(251, 207, 232, 0) 70%);
+  top: -100px;
+  left: -100px;
+}
+
+.ambient-2 {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, #fde68a 0%, rgba(253, 230, 138, 0) 70%);
+  bottom: 10%;
+  right: -150px;
+  animation-delay: -5s;
+}
+
+@keyframes floatAmbient {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 40px) scale(1.15); }
+}
+
+/* ========================================================
+   WELCOMING ENVELOPE OVERLAY
+   ======================================================== */
+#welcome-envelope-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #fff1f2 0%, #ffe4e6 50%, #f43f5e 150%);
+  padding: 1.5rem;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s ease;
+}
+
+#welcome-envelope-overlay.fade-out {
+  opacity: 0;
+  transform: scale(1.1);
+  pointer-events: none;
+}
+
+/* Realistic 3D Envelope */
+.envelope-wrapper {
+  position: relative;
+  width: 320px;
+  height: 220px;
+  background: #fdf4f5;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(244, 63, 94, 0.35), 0 0 0 1px rgba(244, 63, 94, 0.1);
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  perspective: 1000px;
+}
+
+@media (min-width: 640px) {
+  .envelope-wrapper {
+    width: 380px;
+    height: 250px;
+  }
+}
+
+.envelope-wrapper:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 30px 60px -12px rgba(244, 63, 94, 0.45);
+}
+
+.envelope-flap-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 160px solid transparent;
+  border-right: 160px solid transparent;
+  border-top: 130px solid #fecdd3;
+  transform-origin: top center;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 5;
+}
+
+@media (min-width: 640px) {
+  .envelope-flap-top {
+    border-left: 190px solid transparent;
+    border-right: 190px solid transparent;
+    border-top: 150px solid #fecdd3;
+  }
+}
+
+.envelope-pocket {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 160px solid #ffe4e6;
+  border-right: 160px solid #ffe4e6;
+  border-bottom: 120px solid #fda4af;
+  border-top: 100px solid transparent;
+  border-radius: 0 0 12px 12px;
+  z-index: 4;
+}
+
+@media (min-width: 640px) {
+  .envelope-pocket {
+    border-left: 190px solid #ffe4e6;
+    border-right: 190px solid #ffe4e6;
+    border-bottom: 140px solid #fda4af;
+    border-top: 110px solid transparent;
+  }
+}
+
+.wax-seal {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  background: radial-gradient(circle, #e11d48 0%, #9f1239 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fef08a;
+  box-shadow: 0 4px 15px rgba(159, 18, 57, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  z-index: 6;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: pulseSeal 2s infinite ease-in-out;
+}
+
+@keyframes pulseSeal {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+.envelope-wrapper:hover .wax-seal {
+  transform: translate(-50%, -50%) scale(1.12);
+}
+
+#welcome-envelope-overlay.opening .envelope-flap-top {
+  transform: rotateX(180deg);
+  z-index: 1;
+}
+
+#welcome-envelope-overlay.opening .wax-seal {
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+/* ========================================================
+   FLOATING SPARKLE PARTICLES (CURSOR / TOUCH)
+   ======================================================== */
+.cursor-sparkle-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  animation: floatFadeParticle 1.2s forwards ease-out;
+  user-select: none;
+}
+
+@keyframes floatFadeParticle {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.6) translateY(0);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.2) translateY(-25px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4) translateY(-60px);
+  }
+}
+
+/* ========================================================
+   INTERACTIVE BIRTHDAY CAKE
+   ======================================================== */
+.cake-wrapper {
+  position: relative;
+  width: 260px;
+  height: 220px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.cake-plate {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 270px;
+  height: 22px;
+  background: #f1f5f9;
+  border-radius: 50px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), inset 0 2px 4px #ffffff;
+  border: 2px solid #e2e8f0;
+}
+
+.cake-tier-bottom {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 80px;
+  background: linear-gradient(to right, #fbcfe8, #f472b6, #fb7185);
+  border-radius: 16px 16px 8px 8px;
+  box-shadow: inset 0 -10px 15px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(244, 63, 94, 0.2);
+}
+
+.cake-tier-top {
+  position: absolute;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 65px;
+  background: linear-gradient(to right, #fdf2f8, #fce7f3, #fbcfe8);
+  border-radius: 14px 14px 6px 6px;
+  box-shadow: inset 0 -6px 10px rgba(0, 0, 0, 0.05);
+}
+
+.cake-strawberries {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.cake-berry {
+  position: absolute;
+  font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  animation: gentleBob 2s infinite alternate ease-in-out;
+}
+
+@keyframes gentleBob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+.cake-pearls {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  right: 10px;
+  height: 8px;
+  background: radial-gradient(circle, #ffffff 3px, transparent 4px) repeat-x;
+  background-size: 16px 8px;
+  opacity: 0.85;
+}
+
+/* Cream Frosting Drips */
+.frosting-drip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: #fff;
+  border-radius: 12px 12px 14px 14px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.frosting-drip::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 140px;
+  height: 10px;
+  background: radial-gradient(circle at 10px 0, #fff 10px, transparent 11px) repeat-x;
+  background-size: 20px 15px;
+}
+
+/* Candles */
+.candles-row {
+  position: absolute;
+  bottom: 148px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+}
+
+.candle {
+  position: relative;
+  width: 12px;
+  height: 48px;
+  background: repeating-linear-gradient(45deg, #ffffff, #ffffff 6px, #f43f5e 6px, #f43f5e 12px);
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.candle-wick {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 8px;
+  background: #475569;
+}
+
+.candle-flame {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 24px;
+  background: radial-gradient(ellipse at bottom, #fff 10%, #fbbf24 40%, #f97316 70%, #ef4444 100%);
+  border-radius: 50% 50% 35% 35% / 60% 60% 40% 40%;
+  filter: drop-shadow(0 0 10px #f59e0b) drop-shadow(0 0 20px #ef4444);
+  animation: flickerFlame 1.2s infinite alternate ease-in-out;
+  transform-origin: bottom center;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+@keyframes flickerFlame {
+  0% { transform: translateX(-50%) rotate(-2deg) scale(1); }
+  50% { transform: translateX(-50%) rotate(2deg) scale(1.08, 0.95); }
+  100% { transform: translateX(-50%) rotate(-1deg) scale(0.96, 1.05); }
+}
+
+.candle-flame.extinguished {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.1);
+  pointer-events: none;
+}
+
+/* Smoke after blowing */
+.candle-smoke {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background: rgba(148, 163, 184, 0.6);
+  border-radius: 50%;
+  filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.candle-smoke.active {
+  animation: smokeRising 2s forwards ease-out;
+}
+
+@keyframes smokeRising {
+  0% {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(0.8) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-70%) scale(3.5) translateY(-50px);
+  }
+}
+
+/* ========================================================
+   POLAROID GALLERY & WASHI TAPE
+   ======================================================== */
+.polaroid-card {
+  position: relative;
+  background: #ffffff;
+  padding: 12px 12px 18px 12px;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  transform: rotate(var(--rot, 0deg));
+}
+
+.polaroid-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain !important;
+  object-position: center;
+  display: block;
+  background: #fafafa;
+}
+
+.washi-tape {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 24px;
+  background: rgba(254, 205, 211, 0.75);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  backdrop-filter: blur(2px);
+  clip-path: polygon(5% 0, 95% 0, 100% 100%, 0% 100%);
+  z-index: 10;
+}
+
+/* ========================================================
+   WISH BALLOON & SKY CANVAS
+   ======================================================== */
+.wish-sky-section {
+  position: relative;
+  background: linear-gradient(180deg, #090d16 0%, #151d30 60%, #2e1065 100%);
+  border-radius: 36px;
+  overflow: hidden;
+}
+
+#sky-stars-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#floating-balloons-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.wish-flying-balloon {
+  position: absolute;
+  bottom: -150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: flyToStars 7s forwards cubic-bezier(0.2, 0.6, 0.3, 1);
+}
+
+@keyframes flyToStars {
+  0% {
+    transform: translateY(0) scale(0.8) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-400px) scale(0.95) rotate(6deg);
+  }
+  100% {
+    transform: translateY(-900px) scale(0.6) rotate(-8deg);
+    opacity: 0;
+  }
+}
+
+.balloon-body {
+  position: relative;
+  width: 60px;
+  height: 72px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  box-shadow: inset -6px -6px 12px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.balloon-shine {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  width: 14px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+.balloon-knot {
+  width: 8px;
+  height: 6px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  margin-top: -2px;
+}
+
+.balloon-string {
+  width: 1.5px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.balloon-wish-note {
+  background: rgba(255, 255, 255, 0.9);
+  color: #1f2937;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  margin-top: -4px;
+}
+
+/* ========================================================
+   SPINNING VINYL / MUSIC CONTROLLER
+   ======================================================== */
+.spinning {
+  animation: spinRecord 4s linear infinite;
+}
+
+@keyframes spinRecord {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================================
+   ANIMATION HELPERS
+   ======================================================== */
+.animate-bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s infinite ease-in-out;
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 0.95; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* ========================================================
+   OPEN WHEN LETTERS
+   ======================================================== */
+.open-when-card {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.06);
+}
+
+.open-when-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px rgba(244, 63, 94, 0.14);
+}
+
+/* ========================================================
+   LIGHTBOX FOTO - TAMPILKAN FOTO UTUH
+   ======================================================== */
+
+#lightbox-image {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+
+  max-width: 100% !important;
+  max-height: 75vh !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  margin: 0 auto;
+}
+
+/* ========================================================
+   SCRATCH CARDS STYLE
+   ======================================================== */
+.scratch-card-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border: 1px solid #ffe4e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  text-align: center;
+}
+.scratch-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 10;
+  touch-action: none; /* Mencegah layar scroll saat menggosok di HP */
+}

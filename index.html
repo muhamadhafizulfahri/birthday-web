@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Selamat Ulang Tahun, Bidadariku! ✨🎂</title>
+  <meta name="description" content="Website spesial hari ulang tahun dengan kejutan romantis, tiup lilin interaktif, galeri polaroid, dan surat cinta.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rose: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              200: '#fecdd3',
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+            }
+          },
+          animation: {
+            'spin-slow': 'spin 8s linear infinite',
+            'float-slow': 'floatAmbient 8s ease-in-out infinite alternate',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="overflow-hidden select-none">
+
+  <!-- Floating Falling Petals Canvas -->
+  <canvas id="petals-canvas" class="fixed inset-0 pointer-events-none z-0 w-full h-full"></canvas>
+
+  <!-- Ambient Bokeh Lights -->
+  <div class="ambient-circle ambient-1"></div>
+  <div class="ambient-circle ambient-2"></div>
+
+  <!-- ========================================================
+       1. WELCOME ENVELOPE OVERLAY (LAYAR PEMBUKA)
+       ======================================================== -->
+  <div id="welcome-envelope-overlay">
+    <div class="max-w-md w-full flex flex-col items-center text-center">
+      
+      <!-- Badge Lucu -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-rose-200 text-rose-600 text-xs font-semibold shadow-sm mb-6 animate-pulse">
+        <span>✨</span>
+        <span id="envelope-tag-text">Pesan Khusus Untukmu 💌</span>
+      </div>
+
+      <!-- Kartu Amplop 3D -->
+      <div id="envelope-interactive-card" class="envelope-wrapper mb-8 group">
+        <div class="envelope-flap-top"></div>
+        <div class="envelope-pocket"></div>
+        
+        <!-- Wax Seal Merah Mewah -->
+        <div id="envelope-wax-seal" class="wax-seal">
+          <svg class="w-8 h-8 text-rose-100" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Teks Petunjuk Pembuka -->
+      <h2 id="envelope-title-text" class="text-2xl md:text-3xl font-bold font-serif text-gray-800 mb-2">
+        Sebuah Kejutan di Hari Istimewa
+      </h2>
+      <p class="text-gray-600 text-sm md:text-base mb-6 max-w-xs">
+        Ketuk amplop atau tombol di bawah ini dengan lembut untuk membukanya...
+      </p>
+
+      <button id="open-envelope-btn" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold text-sm shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+        <span>Buka Surat Sekarang</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </button>
+
+      <p class="text-xs text-rose-400 mt-4">
+        🎧 Disarankan mengaktifkan suara untuk mendengarkan lagu spesial
+      </p>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       FLOATING CONTROLS (MUSIK & PENGATURAN)
+       ======================================================== -->
+  <header class="fixed top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none">
+    <!-- Left: Recipient Chip -->
+    <div class="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-white/60 shadow-sm text-xs font-semibold text-rose-600">
+      <span>🌸</span>
+      <span class="dynamic-recipient-nickname">Sayangku</span>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="pointer-events-auto flex items-center gap-2">
+      <!-- Music Button -->
+      <button id="music-toggle-btn" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-white/60 shadow-sm text-xs font-medium text-gray-700 hover:bg-white hover:text-rose-500 transition-all" title="Nyalakan/Matikan Musik">
+        <span id="music-icon">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+          </svg>
+        </span>
+        <span id="music-status-text" class="hidden sm:inline">Putar Musik 🎵</span>
+      </button>
+
+      <!-- Edit / Customize Button -->
+      <button id="open-settings-modal-btn" class="p-2 rounded-full bg-white/80 backdrop-blur-md border border-white/60 shadow-sm text-gray-600 hover:text-rose-600 hover:rotate-90 transition-all" title="Ubah Nama & Foto">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================
+       MAIN SCROLLABLE CONTENT
+       ======================================================== -->
+  <main class="relative z-10 max-w-4xl mx-auto px-4 pt-20 pb-28">
+
+    <!-- 1. HERO SECTION -->
+    <section class="text-center pt-8 pb-14">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-100/80 border border-rose-300/60 text-rose-600 text-xs font-semibold mb-6 shadow-sm">
+        <span>🎉</span>
+        <span>Hari Paling Bersejarah & Paling Indah</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-black font-serif text-gray-800 leading-tight mb-4">
+        Selamat Ulang Tahun, <br class="hidden sm:inline">
+        <span class="dynamic-recipient-name bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 bg-clip-text text-transparent underline decoration-rose-300 decoration-wavy decoration-2">
+          Ririn Amelia
+        </span> ✨
+      </h1>
+
+      <p id="hero-subtitle-text" class="text-gray-600 text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-10">
+        Hari ini adalah hari di mana dunia menjadi tempat yang jauh lebih indah dan hangat karena kehadiranmu.
+      </p>
+
+      <!-- LIVE MIRACLE COUNTER (USIA & HARI HIDUP) -->
+      <div class="bg-white/70 backdrop-blur-md border border-white/80 rounded-3xl p-6 shadow-xl shadow-rose-100/60 max-w-lg mx-auto">
+        <div class="text-xs uppercase tracking-widest font-bold text-rose-500 mb-3 flex items-center justify-center gap-1.5">
+          <span>💖</span>
+          <span>Waktu Kamu Menerangi Dunia Ini</span>
+          <span>💖</span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 sm:gap-3 text-center">
+          <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-100">
+            <span id="count-days" class="block text-xl sm:text-2xl font-black text-rose-600 font-mono">0</span>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium uppercase">Hari</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-100">
+            <span id="count-hours" class="block text-xl sm:text-2xl font-black text-rose-600 font-mono">0</span>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium uppercase">Jam</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-100">
+            <span id="count-mins" class="block text-xl sm:text-2xl font-black text-rose-600 font-mono">0</span>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium uppercase">Menit</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-100">
+            <span id="count-secs" class="block text-xl sm:text-2xl font-black text-rose-600 font-mono">0</span>
+            <span class="text-[10px] sm:text-xs text-gray-500 font-medium uppercase">Detik</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-500 mt-4 italic">
+          Kamu resmi menginjak usia yang ke-<span id="dynamic-age-number" class="font-bold text-rose-500 text-sm">21</span> tahun penuh pesona!
+        </p>
+        <!-- TAMBAHKAN INI -->
+        <div class="mt-4 pt-4 border-t border-rose-100">
+          <p class="text-[10px] uppercase font-bold text-rose-400 mb-1">⏳ Menuju Ulang Tahun Berikutnya:</p>
+          <p id="next-bday-countdown" class="text-sm font-mono font-bold text-gray-700">Menghitung...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. INTERACTIVE BIRTHDAY CAKE SECTION -->
+    <section class="py-12 text-center">
+      <div class="max-w-md mx-auto bg-white/70 backdrop-blur-md border border-white/80 rounded-3xl p-6 sm:p-8 shadow-xl shadow-rose-100/60 relative overflow-hidden">
+        
+        <div class="mb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-50 px-3 py-1 rounded-full">
+            Interaktif & Ajaib ✨
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-bold font-serif text-gray-800 mt-2">
+            Tiup Lilin Ulang Tahunmu
+          </h2>
+          <p id="cake-status-text" class="text-sm text-gray-600 mt-2">
+            Pejamkan mata, panjatkan doamu dalam hati, lalu tiup lilinnya! 🎂
+          </p>
+        </div>
+
+        <!-- 3D LAYERED CAKE -->
+        <div id="cake-interactive-area" class="py-6">
+          <div class="cake-wrapper">
+            <!-- Plate -->
+            <div class="cake-plate"></div>
+            <!-- Bottom Tier -->
+            <div class="cake-tier-bottom">
+              <div class="frosting-drip"></div>
+              <div class="cake-pearls"></div>
+            </div>
+            <!-- Top Tier -->
+            <div class="cake-tier-top">
+              <div class="frosting-drip"></div>
+              <div class="cake-strawberries">
+                <span class="cake-berry" style="left: 12px;">🍓</span>
+                <span class="cake-berry" style="left: 45px;">🌸</span>
+                <span class="cake-berry" style="right: 45px;">🌸</span>
+                <span class="cake-berry" style="right: 12px;">🍓</span>
+              </div>
+            </div>
+            <!-- Candles Row -->
+            <div class="candles-row">
+              <!-- Candle 1 -->
+              <div class="candle">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="candle-smoke"></div>
+              </div>
+              <!-- Candle 2 (Center) -->
+              <div class="candle" style="height: 52px; transform: translateY(-4px);">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="candle-smoke"></div>
+              </div>
+              <!-- Candle 3 -->
+              <div class="candle">
+                <div class="candle-wick"></div>
+                <div class="candle-flame"></div>
+                <div class="candle-smoke"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cake Controls (Blow buttons) -->
+        <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+          <button id="blow-candle-btn" class="px-6 py-3 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold text-sm shadow-md shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+            <span>Tiup Lilin Sekarang</span>
+            <span>🌬️</span>
+          </button>
+
+          <button id="mic-blow-btn" class="px-5 py-3 rounded-full bg-white border border-rose-200 text-rose-600 font-semibold text-sm shadow-sm hover:bg-rose-50 hover:border-rose-300 transition-all flex items-center gap-1.5" title="Gunakan mic untuk meniup langsung ke ponsel/laptop">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+            </svg>
+            <span>Tiup Pakai Mic 🎤</span>
+          </button>
+
+          <button id="relight-candle-btn" style="display: none;" class="px-6 py-3 rounded-full bg-amber-500 text-white font-semibold text-sm shadow-md hover:bg-amber-600 hover:scale-105 transition-all items-center gap-2">
+            <span>Nyalakan Lilin Lagi 🕯️</span>
+          </button>
+        </div>
+
+        <!-- Wish Success Card (Shown after blowing) -->
+        <div id="wish-success-card" class="hidden mt-6 p-4 rounded-2xl bg-gradient-to-r from-pink-50 via-rose-50 to-pink-50 border border-rose-200 text-gray-800">
+          <div class="text-3xl mb-1">🎉 💐 🌟</div>
+          <h4 class="font-bold font-serif text-rose-600 text-base sm:text-lg mb-1">
+            Harapanmu Telah Terucap!
+          </h4>
+          <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+            Semoga setiap detik di usiamu yang baru ini selalu dinaungi berkah, kesehatan, tawa yang tak ada habisnya, dan kebahagiaan yang berlipat ganda!
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. SWEET REASONS ("ALASAN KAMU BEGITU ISTIMEWA") -->
+    <section class="py-12">
+      <div class="text-center max-w-lg mx-auto mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-rose-500 bg-rose-100/70 px-3 py-1 rounded-full">
+          Hanya Ada Satu Kamu di Dunia 🌸
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-bold font-serif text-gray-800 mt-2">
+          Mengapa Kamu Begitu Istimewa
+        </h2>
+        <p class="text-sm text-gray-600 mt-2">
+          Ada jutaan alasan mengapa kehadiranmu begitu berarti. Ini adalah beberapa di antaranya:
+        </p>
+      </div>
+
+      <!-- Reasons Grid -->
+      <div id="reasons-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+<!-- ========================================================
+         FITUR BARU: DEDIKASI LAGU
+         ======================================================== -->
+    <section class="py-12">
+      <div class="max-w-2xl mx-auto bg-white/60 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl shadow-rose-100/50 border border-white/80 text-center relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-rose-200/50 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-200/50 rounded-full blur-2xl"></div>
+        
+        <span class="text-3xl mb-3 block">🎵</span>
+        <h2 id="song-dedication-title" class="text-2xl sm:text-3xl font-bold font-serif text-gray-800 mb-2">Lagu Spesial Buatmu</h2>
+        <div class="mb-6">
+          <p id="song-lyric-quote" class="text-lg font-handwritten text-rose-500 font-bold mb-1">"Lirik..."</p>
+          <p id="song-artist-info" class="text-xs text-gray-500 uppercase tracking-widest">Judul - Artis</p>
+        </div>
+        <p id="song-message" class="text-sm text-gray-600 leading-relaxed mb-6 italic max-w-md mx-auto">Pesan lagu...</p>
+        <!-- Kontainer iframe Spotify/Youtube jika ada -->
+        <div id="song-embed-container" class="rounded-xl overflow-hidden shadow-md max-w-sm mx-auto hidden"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         FITUR BARU: MINI QUIZ (TEBAK-TEBAKAN)
+         ======================================================== -->
+    <!-- ========================================================
+         FITUR BARU: TOMBOL PEMBANGKIT MOOD
+         ======================================================== -->
+    <section class="py-12 text-center">
+      <div class="max-w-lg mx-auto mb-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-rose-500 bg-rose-100/70 px-3 py-1 rounded-full">Mood Booster 💌</span>
+        <h2 class="text-2xl sm:text-3xl font-bold font-serif text-gray-800 mt-2">Butuh Senyum Hari Ini?</h2>
+        <p class="text-sm text-gray-600 mt-2 px-4">Ketuk tombol di bawah ini setiap kali harimu terasa berat atau kamu cuma butuh alasan buat tersenyum.</p>
+      </div>
+      
+      <div class="max-w-md mx-auto relative px-4">
+        <!-- Tempat Muncul Pesan -->
+        <div id="mood-message-container" class="min-h-[100px] flex items-center justify-center p-6 bg-[#fffdfa] rounded-3xl border border-rose-200 shadow-lg shadow-rose-100/50 mb-6 transition-all duration-300 scale-95 opacity-0 hidden">
+          <p id="mood-message-text" class="text-lg font-serif text-rose-600 font-bold leading-relaxed">...</p>
+        </div>
+        
+        <!-- Tombol Utama -->
+        <button id="mood-booster-btn" class="relative group px-8 py-4 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-sm shadow-xl shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-105 active:scale-95 transition-all overflow-hidden flex items-center gap-2 mx-auto">
+          <span class="relative z-10 text-xl">🪄</span>
+          <span class="relative z-10">Mantra Penenang Hati</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         FITUR BARU: KARTU GOSOK (SCRATCH CARDS)
+         ======================================================== -->
+    <section class="py-12">
+      <div class="text-center max-w-lg mx-auto mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-rose-500 bg-rose-100/70 px-3 py-1 rounded-full">Kejutan Rahasia 🔮</span>
+        <h2 class="text-2xl sm:text-3xl font-bold font-serif text-gray-800 mt-2">Kartu Gosok</h2>
+        <p class="text-sm text-gray-600 mt-2">Usap perlahan kotak perak di bawah ini untuk melihat pesan rahasianya!</p>
+      </div>
+      <div id="scratch-cards-container" class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+        <!-- Kartu di-render via JS -->
+      </div>
+    </section>
+
+<!-- 4. POLAROID MEMORY GALLERY -->
+    <section class="py-12">
+      <div class="text-center max-w-lg mx-auto mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-rose-500 bg-rose-100/70 px-3 py-1 rounded-full">
+          Potret Paling Manis 📸
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-bold font-serif text-gray-800 mt-2">
+          Galeri Kenangan Kita
+        </h2>
+        <p class="text-sm text-gray-600 mt-2">
+          Ketuk salah satu foto polaroid untuk melihatnya lebih dekat!
+        </p>
+      </div>
+
+      <!-- Polaroid Cards Grid -->
+      <div id="polaroid-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-6 pt-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 5. THE HEARTFELT LOVE LETTER (SURAT CINTA & HARAPAN) -->
+    <section class="py-12">
+      <div class="max-w-2xl mx-auto">
+        <!-- Letter Container with Parchment Style -->
+        <div class="relative bg-[#fffdfa] rounded-3xl p-6 sm:p-10 md:p-12 shadow-2xl border border-rose-100 overflow-hidden">
+          
+          <!-- Decorative Top Ribbon -->
+          <div class="flex items-center justify-between border-b border-rose-100 pb-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">💌</span>
+              <span id="letter-badge-text" class="text-xs font-bold uppercase tracking-wider text-rose-500">
+                Surat Khusus Dari Lubuk Hati
+              </span>
+            </div>
+            <div class="text-xs text-gray-400 font-mono">
+              Hari Spesial
+            </div>
+          </div>
+
+          <!-- Salutation -->
+          <h3 id="letter-salutation-text" class="text-xl sm:text-2xl font-bold font-serif text-gray-800 mb-6">
+            Hai Sayangku yang Paling Cantik,
+          </h3>
+
+          <!-- Letter Body -->
+          <div id="letter-body-paragraphs" class="space-y-4">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Closing & Signature -->
+          <div class="mt-8 pt-6 border-t border-rose-100 flex flex-col items-end">
+            <p id="letter-closing-text" class="text-sm text-gray-600 italic mb-2">
+              Selamat ulang tahun, cintaku.
+            </p>
+            <p id="letter-signature-text" class="text-xs text-rose-500 font-semibold mb-1">
+              Dengan segenap cintaku yang tak terhingga,
+            </p>
+            <div class="font-handwritten text-2xl sm:text-3xl text-rose-600 font-bold dynamic-sender-name">
+              Seseorang yang Menyayangimu ❤️
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. KOTAK SURAT "BUKA SAAT..." (OPEN WHEN LETTERS) -->
+    <section class="py-12">
+      <div class="text-center max-w-lg mx-auto mb-10">
+        <span class="text-xs font-bold uppercase tracking-wider text-rose-500 bg-rose-100/70 px-3 py-1 rounded-full">
+          Dekapan Kata-Kata & Penenang Hati 💌
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-bold font-serif text-gray-800 mt-2">
+          Kotak Surat "Buka Saat..."
+        </h2>
+        <p class="text-sm text-gray-600 mt-2">
+          Kapan pun perasaanmu butuh sandaran atau pelukan hangat, ketuk salah satu surat di bawah ini:
+        </p>
+      </div>
+
+      <!-- Open When Cards Grid -->
+      <div id="open-when-grid-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 7. WISH BALLOON RELEASE & NIGHT SKY ("POHON / BALON HARAPAN") -->
+    <section class="py-12">
+      <div class="wish-sky-section relative p-6 sm:p-10 shadow-2xl text-white">
+        <!-- Starry Canvas Background -->
+        <canvas id="sky-stars-canvas"></canvas>
+        <div id="floating-balloons-container"></div>
+
+        <div class="relative z-10 max-w-xl mx-auto text-center">
+          <div class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-pink-300 text-xs font-semibold mb-4">
+            <span>✨</span>
+            <span>Menerbangkan Doa ke Semesta</span>
+          </div>
+
+          <h2 class="text-2xl sm:text-4xl font-bold font-serif text-white mb-2">
+            Terbangkan Balon Harapanmu
+          </h2>
+          <p class="text-sm text-pink-200/90 leading-relaxed mb-6">
+            Tuliskan apa saja impian dan doa yang ingin kamu capai di tahun ini. Biarkan ia terbang menuju bintang-bintang!
+          </p>
+
+          <!-- Wish Input Form -->
+          <form id="wish-balloon-form" class="flex flex-col sm:flex-row items-center gap-2 max-w-md mx-auto mb-8">
+            <input type="text" id="wish-balloon-input" placeholder="Tuliskan harapan indahmu..." required class="w-full px-5 py-3.5 rounded-full bg-white/15 backdrop-blur-md border border-white/30 text-white placeholder-pink-200/70 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white/25 transition-all">
+            <button type="submit" class="w-full sm:w-auto px-6 py-3.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-bold shadow-lg shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all shrink-0 flex items-center justify-center gap-1.5">
+              <span>Terbangkan</span>
+              <span>🎈</span>
+            </button>
+          </form>
+
+          <!-- List of Sent Wishes -->
+          <div class="text-left mt-6 pt-6 border-t border-white/10">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-pink-300 flex items-center gap-2">
+                <span>🌟</span>
+                <span>Doa yang Telah Meluncur ke Bintang:</span>
+              </h4>
+              <button type="button" id="clear-all-wishes-btn" class="text-[11px] text-pink-300/80 hover:text-white underline transition-colors" style="display: none;">
+                Bersihkan Riwayat
+              </button>
+            </div>
+            <div id="sent-wishes-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="pt-16 pb-8 text-center text-gray-500 text-xs">
+      <p class="mb-2">
+        Dibuat dengan segenap cinta & ketulusan untuk <span class="font-bold text-rose-500 dynamic-recipient-name">Adinda Putri</span> <span id="secret-admin-trigger" class="cursor-pointer select-none inline-block hover:scale-125 transition-transform" title="Ketuk 3x untuk membuka pengaturan rahasia">❤️</span>
+      </p>
+      <p class="text-gray-400">
+        Semoga harimu selalu dipenuhi kebahagiaan tak berujung.
+      </p>
+    </footer>
+
+  </main>
+
+  <!-- ========================================================
+       MODAL: LIGHTBOX POLAROID
+       ======================================================== -->
+  <div id="polaroid-lightbox-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="relative max-w-lg w-full bg-white rounded-3xl p-4 sm:p-6 shadow-2xl animate-bounce-in">
+      <button id="lightbox-close-btn" class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+        ✕
+      </button>
+      <div class="rounded-2xl overflow-hidden mb-4 bg-gray-100 max-h-[70vh]">
+        <img id="lightbox-image" src="" alt="Kenangan" class="w-full h-auto object-contain mx-auto">
+      </div>
+      <div class="text-center">
+        <span id="lightbox-tag" class="text-xs font-bold uppercase tracking-widest text-rose-500 bg-rose-50 px-3 py-1 rounded-full mb-2 inline-block">
+          Momen Indah
+        </span>
+        <p id="lightbox-caption" class="text-gray-800 text-base sm:text-lg font-handwritten mt-1">
+          "Caption"
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: BACA SURAT "BUKA SAAT..."
+       ======================================================== -->
+  <div id="open-when-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="relative max-w-lg w-full bg-[#fffdfa] rounded-3xl p-6 sm:p-8 shadow-2xl border border-rose-100 max-h-[85vh] overflow-y-auto animate-bounce-in">
+      <button id="close-open-when-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-rose-50 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Envelope / Wax stamp header -->
+      <div class="text-center pb-4 mb-4 border-b border-rose-100">
+        <div id="ow-modal-icon" class="w-16 h-16 rounded-2xl bg-rose-50 text-4xl flex items-center justify-center mx-auto mb-3 shadow-inner">
+          🥺
+        </div>
+        <span id="ow-modal-badge" class="text-xs font-bold uppercase tracking-wider text-rose-500 bg-rose-50 px-3 py-1 rounded-full inline-block mb-2">
+          Saat Kamu Rindu
+        </span>
+        <h3 id="ow-modal-title" class="text-xl sm:text-2xl font-bold font-serif text-gray-800">
+          Buka saat kamu lagi kangen...
+        </h3>
+      </div>
+
+      <!-- Letter Content -->
+      <div id="ow-modal-body" class="text-gray-700 font-serif text-base sm:text-lg leading-relaxed whitespace-pre-line px-1">
+        <!-- Message text -->
+      </div>
+
+      <!-- Footer closing -->
+      <div class="mt-8 pt-4 border-t border-rose-100 text-right">
+        <span class="text-xs text-rose-400 font-medium">Selalu ada untukmu,</span>
+        <p class="font-handwritten text-xl text-rose-600 font-bold dynamic-sender-name">
+          Seseorang yang Menyayangimu ❤️
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: PENGATURAN / CUSTOMIZER (ATUR NAMA, FOTO & TEKS)
+       ======================================================== -->
+  <div id="settings-editor-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="relative max-w-xl w-full bg-white rounded-3xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-5">
+        <div>
+          <h3 class="text-xl font-bold font-serif text-gray-800 flex items-center gap-2">
+            <span>⚙️</span>
+            <span>Pengaturan Website Ulang Tahun</span>
+          </h3>
+          <p class="text-xs text-gray-500 mt-0.5">Ubah nama, foto, ucapan, dan tema warna sesuai keinginanmu!</p>
+        </div>
+        <button id="close-settings-modal-btn" class="text-gray-400 hover:text-gray-600 p-1">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="settings-config-form" class="space-y-4">
+        
+        <!-- Mode Privasi / Sembunyikan untuk Penerima -->
+        <div class="p-3.5 rounded-2xl bg-rose-50/80 border border-rose-200 text-left">
+          <div class="flex items-start gap-2.5">
+            <span class="text-lg">🔒</span>
+            <div class="flex-1 text-xs">
+              <span class="font-bold text-gray-800 block mb-1">Mode Tampilan Penerima (Si Dia)</span>
+              <p class="text-gray-600 mb-2 leading-relaxed">
+                Aktifkan opsi ini agar <strong>tombol gerigi pengaturan ini disembunyikan</strong> saat website dibuka olehnya. Website akan tampak 100% murni seperti kado buatan tangan tanpa tombol edit!
+              </p>
+              <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-rose-600">
+                <input type="checkbox" id="checkbox-hide-settings" class="w-4 h-4 rounded text-rose-500 focus:ring-rose-400 cursor-pointer">
+                <span>Sembunyikan tombol gerigi ini untuk dia</span>
+              </label>
+              <div class="mt-2 text-[11px] text-gray-500 bg-white/70 p-2 rounded-lg border border-rose-100">
+                🔑 <em>Cara kamu membukanya lagi nanti:</em> Tambahkan <code>?edit=true</code> pada URL, atau ketuk 3x ikon <span class="text-rose-500 font-bold">❤️</span> di bagian paling bawah website!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nama & Panggilan -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap / Tampilan</label>
+            <input type="text" id="input-recipient-name" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Panggilan / Kesayangan</label>
+            <input type="text" id="input-recipient-nickname" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none" required>
+          </div>
+        </div>
+
+        <!-- Tanggal Lahir & Pengirim -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal Lahir (YYYY-MM-DD)</label>
+            <input type="date" id="input-birth-date" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nama Pengirim</label>
+            <input type="text" id="input-sender-name" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Tema Warna -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Pilihan Tema Warna</label>
+          <select id="input-theme-select" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none">
+            <option value="rose-gold">Rose Gold (Romantis & Mewah)</option>
+            <option value="lavender">Sweet Lavender (Manis & Menenangkan)</option>
+            <option value="peach">Peach Sunset (Hangat & Ceria)</option>
+            <option value="midnight">Midnight Starlight (Malam Romantis & Bintang)</option>
+          </select>
+        </div>
+
+        <!-- URL Lagu Kustom -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">URL Audio MP3 (Opsional)</label>
+          <input type="text" id="input-custom-audio" placeholder="Biarkan kosong untuk melodi synthesizer bawaan" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none">
+          <span class="text-[11px] text-gray-400">Jika dikosongkan, musik box 'Happy Birthday' otomatis dimainkan.</span>
+        </div>
+
+        <!-- Upload Foto Galeri Polaroid -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">Ganti Foto Galeri (Pilih hingga 6 foto)</label>
+          <input type="file" id="photo-uploader-input" accept="image/*" multiple class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-600 hover:file:bg-rose-100 cursor-pointer">
+          <div id="uploaded-photos-preview" class="flex gap-2 mt-2 flex-wrap"></div>
+        </div>
+
+        <!-- Surat Cinta -->
+        <div class="border-t border-gray-100 pt-3">
+          <label class="block text-xs font-bold text-gray-700 mb-1">Salam Pembuka Surat</label>
+          <input type="text" id="input-letter-salutation" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none mb-2">
+          
+          <label class="block text-xs font-bold text-gray-700 mb-1">Isi Paragraf Surat (Pisahkan tiap paragraf dengan enter dua kali)</label>
+          <textarea id="input-letter-body" rows="4" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none leading-relaxed"></textarea>
+
+          <label class="block text-xs font-bold text-gray-700 mb-1 mt-2">Penutup Surat</label>
+          <input type="text" id="input-letter-closing" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-rose-400 focus:outline-none">
+        </div>
+
+        <!-- Tombol Simpan & Reset -->
+        <div class="pt-4 flex flex-wrap items-center justify-between gap-2 border-t border-gray-100">
+          <div class="flex items-center gap-2">
+            <button type="button" id="reset-config-btn" class="px-3.5 py-2 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold hover:bg-gray-200 transition-colors">
+              Reset Awal
+            </button>
+            <button type="button" id="download-config-btn" class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold hover:bg-rose-100 transition-colors flex items-center gap-1.5" title="Unduh file config.js permanen untuk hosting">
+              <span>📥</span>
+              <span>Unduh config.js</span>
+            </button>
+          </div>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-bold shadow-md shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all">
+            Simpan & Terapkan ✨
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/petals.js"></script>
+  <script src="js/cake.js"></script>
+  <script src="js/balloons.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
